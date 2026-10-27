@@ -86,6 +86,8 @@
 
     .app-shell { min-width: 980px; background: white; }
     .masthead { height: 48px; display: flex; align-items: center; gap: 16px; padding: 0 20px; background: #f0f0f0; border-bottom: 1px solid #e2e2e2; }
+    .menu-toggle { display: grid; place-items: center; width: 30px; height: 32px; padding: 0; border: 0; background: transparent; cursor: pointer; font-size: 16px; }
+    .menu-toggle:hover { background: #e2e2e2; }
     .brand-mark { color: #ee0000; font-size: 22px; font-weight: 900; }
     .product-menu { min-width: 205px; padding: 8px 12px; border: 1px solid #8a8d90; border-radius: 3px; background: white; }
     .mast-spacer { flex: 1; }
@@ -94,6 +96,8 @@
 
     .workspace { display: grid; grid-template-columns: 210px minmax(0, 1fr); min-height: calc(100vh - 120px); }
     .sidebar { padding: 0 9px 30px; background: #f0f0f0; border-right: 1px solid #e6e6e6; }
+    body.nav-collapsed .workspace { grid-template-columns: minmax(0, 1fr); }
+    body.nav-collapsed .sidebar { display: none; }
     .side-heading { margin: 0 -9px 14px; padding: 17px 22px 15px; border-bottom: 3px solid #d2d2d2; font-size: 14px; }
     .nav-item, .nav-section { display: block; width: 100%; padding: 9px 13px; border: 0; background: transparent; text-align: left; font-size: 12px; }
     .nav-section { margin-top: 4px; }
@@ -154,12 +158,6 @@
     .system-meta { margin: 14px 0 0; color: #3c3f42; font-size: 12px; }
     .system-meta code { padding: 2px 5px; background: #ededed; font-family: inherit; }
     .system-type { display: inline-block; margin-top: 12px; padding: 4px 9px; border-radius: 12px; background: #ededed; font-size: 11px; }
-    .system-opportunity { display: flex; align-items: center; gap: 14px; max-width: 820px; margin-top: 30px; padding: 14px 16px; border: 1px solid #b8d6f0; border-left: 4px solid var(--blue); background: #f5faff; }
-    .system-opportunity .opportunity-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: white; background: var(--blue); font-size: 20px; }
-    .system-opportunity strong { display: block; margin-bottom: 3px; }
-    .system-opportunity p { margin: 0; color: #3c3f42; line-height: 1.4; font-size: 12px; }
-    .system-opportunity .clear-link { margin-left: auto; white-space: nowrap; }
-
     .status {
       display: inline-flex;
       align-items: center;
@@ -258,7 +256,7 @@
 
   <div class="app-shell">
     <header class="masthead">
-      <span aria-hidden="true">☰</span>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Hide navigation" aria-controls="primaryNavigation" aria-expanded="true">☰</button>
       <span class="brand-mark" aria-label="Red Hat">◉</span>
       <button class="product-menu" type="button">▦&nbsp;&nbsp; Red Hat Hybrid Cloud Console&nbsp;&nbsp;⌄</button>
       <span class="mast-spacer"></span>
@@ -270,7 +268,7 @@
     </header>
 
     <div class="workspace">
-      <aside class="sidebar" aria-label="Primary navigation">
+      <aside class="sidebar" id="primaryNavigation" aria-label="Primary navigation">
         <div class="side-heading">Red Hat Enterprise Linux</div>
         <button class="nav-item link">Dashboard</button>
         <button class="nav-section">Inventory <span style="float:right">⌄</span></button>
@@ -420,12 +418,6 @@
             <div><button class="btn" type="button" disabled>Delete</button>&nbsp; <button class="btn" type="button">Actions&nbsp;⌄</button></div>
           </div>
 
-          <div class="system-opportunity">
-            <div><span class="opportunity-icon" aria-hidden="true">↻</span></div>
-            <div><strong>3 CVEs have a live patch available</strong><p>These vulnerabilities can be addressed on this running kernel without an immediate reboot. Patch selection occurs in Remediations.</p></div>
-            <button class="clear-link" id="showSystemAvailable" type="button">Show available CVEs</button>
-          </div>
-
           <section class="table-section">
             <div class="table-title-row"><h2><span id="systemVisibleCount">8</span> CVEs</h2><span class="subtle" id="systemSelectionCount" aria-live="polite"></span></div>
             <div class="toolbar">
@@ -550,7 +542,7 @@
         <tr class="data-row ${selected.has(system.id) ? 'selected' : ''}" data-id="${system.id}">
           <td class="expand-col"><button class="expand-btn" type="button" aria-expanded="false" aria-label="Show live patch details for ${system.name}">›</button></td>
           <td class="check-col"><input class="row-check" type="checkbox" ${selected.has(system.id) ? 'checked' : ''} aria-label="Select ${system.name}"></td>
-          <td class="system-cell"><strong>${system.id === 1 ? `<a href="#system" data-navigate="system">▣&nbsp; ${system.name}</a>` : `▣&nbsp; ${system.name}`}</strong><small>${system.kernel}</small></td>
+          <td class="system-cell"><strong>${system.id === 1 ? `<a href="#system" data-navigate="system">${system.name}</a>` : system.name}</strong><small>${system.kernel}</small></td>
           <td>${system.workspace}</td><td>⬟&nbsp; ${system.tags}</td><td>${system.os}</td>
           <td><a href="#">${system.advisory}</a></td><td>${system.status}</td><td>${system.seenText}</td><td>${system.remediation}</td>
           <td class="livepatch-col">${statusBadge(system.patch)}</td><td><button class="more" type="button" aria-label="Actions for ${system.name}">⋮</button></td>
@@ -647,6 +639,12 @@
       syncViewFromHash();
     }));
     window.addEventListener('hashchange', syncViewFromHash);
+    const menuToggle = document.getElementById('menuToggle');
+    menuToggle.addEventListener('click', () => {
+      const collapsed = document.body.classList.toggle('nav-collapsed');
+      menuToggle.setAttribute('aria-expanded', String(!collapsed));
+      menuToggle.setAttribute('aria-label', collapsed ? 'Show navigation' : 'Hide navigation');
+    });
 
     filter.addEventListener('change', render);
     search.addEventListener('input', render);
@@ -657,7 +655,6 @@
 
     document.getElementById('systemPatchFilter').addEventListener('change', renderSystem);
     document.getElementById('systemSearch').addEventListener('input', renderSystem);
-    document.getElementById('showSystemAvailable').addEventListener('click', () => { document.getElementById('systemPatchFilter').value = 'available'; renderSystem(); });
     document.getElementById('systemReset').addEventListener('click', () => { document.getElementById('systemPatchFilter').value = 'all'; document.getElementById('systemSearch').value = ''; renderSystem(); });
     document.getElementById('systemSelectAll').addEventListener('click', () => {
       const visible = systemFilteredCves();
