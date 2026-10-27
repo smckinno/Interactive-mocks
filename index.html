@@ -82,7 +82,6 @@
     .btn.primary:hover { background: var(--blue-dark); }
     .btn:disabled { color: #8a8d90; border-color: #d2d2d2; background: #d2d2d2; cursor: not-allowed; }
     .btn.dark { color: white; border-color: #8a8d90; background: transparent; }
-    .icon-btn { width: 36px; padding: 0; display: inline-grid; place-items: center; }
 
     .app-shell { min-width: 980px; background: white; }
     .masthead { height: 48px; display: flex; align-items: center; gap: 16px; padding: 0 20px; background: #f0f0f0; border-bottom: 1px solid #e2e2e2; }
@@ -91,8 +90,6 @@
     .brand-mark { color: #ee0000; font-size: 22px; font-weight: 900; }
     .product-menu { min-width: 205px; padding: 8px 12px; border: 1px solid #8a8d90; border-radius: 3px; background: white; }
     .mast-spacer { flex: 1; }
-    .mast-action { width: 34px; height: 32px; border: 1px solid #8a8d90; border-radius: 3px; background: white; }
-    .user-menu { padding: 8px 12px; border: 1px solid #8a8d90; border-radius: 3px; background: white; }
 
     .workspace { display: grid; grid-template-columns: 210px minmax(0, 1fr); min-height: calc(100vh - 120px); }
     .sidebar { padding: 0 9px 30px; background: #f0f0f0; border-right: 1px solid #e6e6e6; }
@@ -168,12 +165,27 @@
       white-space: nowrap;
       font-weight: 600;
     }
+    .status:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .available { color: var(--blue-dark); background: var(--blue-light); }
     .applied { color: #23511f; background: #eaf6e8; }
     .setup { color: #6f3b00; background: #fff1df; }
     .unavailable { color: #3c3f42; background: #ededed; }
     .unknown { color: #4f5255; border-color: #8a8d90; background: white; }
-    .status-text { display: block; margin-top: 5px; color: var(--muted); line-height: 1.3; }
+    .status-tooltip {
+      position: fixed;
+      z-index: 100;
+      max-width: 260px;
+      padding: 9px 12px;
+      border-radius: 4px;
+      background: #151515;
+      color: white;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.4;
+      pointer-events: none;
+    }
+    .status-tooltip[hidden] { display: none; }
     .more { width: 28px; border: 0; background: none; cursor: pointer; font-size: 18px; }
     .detail-row { display: none; background: #fafafa; }
     .detail-row.open { display: table-row; }
@@ -258,11 +270,6 @@
       <span class="brand-mark" aria-label="Red Hat">◉</span>
       <button class="product-menu" type="button">▦&nbsp;&nbsp; Red Hat Hybrid Cloud Console&nbsp;&nbsp;⌄</button>
       <span class="mast-spacer"></span>
-      <span aria-hidden="true">⌕</span>
-      <button class="mast-action" type="button" aria-label="Notifications">♟</button>
-      <button class="mast-action" type="button" aria-label="Settings">⚙</button>
-      <button class="mast-action" type="button" aria-label="Help">? Help</button>
-      <button class="user-menu" type="button">●&nbsp; Shayna McKinnon&nbsp;⌄</button>
     </header>
 
     <div class="workspace">
@@ -341,8 +348,6 @@
             <button class="btn primary" id="remediateBtn" type="button" disabled>Plan remediation</button>
             <div class="toolbar-spacer"></div>
             <span id="rangeLabel">1–8 of 8</span>
-            <button class="icon-btn btn" type="button" aria-label="Table settings">⚙</button>
-            <button class="icon-btn btn" type="button" aria-label="More actions">⋮</button>
           </div>
 
           <div id="filterSummary" hidden>
@@ -427,7 +432,6 @@
               <label class="search-wrap"><span class="sr-only">Filter by CVE</span><input id="systemSearch" type="search" placeholder="Filter by CVE"><span aria-hidden="true">⌕</span></label>
               <button class="btn primary" id="systemRemediate" type="button" disabled>Plan remediation</button>
               <div class="toolbar-spacer"></div><span id="systemRange">1–8 of 8</span>
-              <button class="icon-btn btn" type="button" aria-label="Table settings">⚙</button><button class="icon-btn btn" type="button" aria-label="More actions">⋮</button>
             </div>
             <div class="table-scroll" id="systemTableWrap">
               <table aria-label="CVEs affecting prod-api-01.example.com">
@@ -469,6 +473,7 @@
     <strong>Handoff to Remediations</strong>
     <span id="toastText"></span>
   </div>
+  <div class="status-tooltip" id="statusTooltip" role="tooltip" hidden></div>
 
   <script>
     const systems = [
@@ -512,9 +517,8 @@
     const search = document.getElementById('searchInput');
     const remBtn = document.getElementById('remediateBtn');
 
-    function statusBadge(patch, attached = false) {
-      const detail = attached ? '' : `<small class="status-text">${explanations[patch]}</small>`;
-      return `<span class="status ${patch}">${labels[patch]}</span>${detail}`;
+    function statusBadge(patch) {
+      return `<span class="status ${patch}" tabindex="0" aria-label="${labels[patch]}: ${explanations[patch]}" data-tooltip="${explanations[patch]}">${labels[patch]}</span>`;
     }
 
     function filteredSystems() {
@@ -687,6 +691,33 @@
     document.getElementById('researchBtn').addEventListener('click', () => researchDialog.showModal());
     document.querySelector('.system-info').addEventListener('click', () => researchDialog.showModal());
     document.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => researchDialog.close()));
+
+    const statusTooltip = document.getElementById('statusTooltip');
+    function showStatusTooltip(label) {
+      statusTooltip.textContent = label.dataset.tooltip;
+      statusTooltip.hidden = false;
+      const rect = label.getBoundingClientRect();
+      const width = statusTooltip.offsetWidth;
+      const height = statusTooltip.offsetHeight;
+      statusTooltip.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))}px`;
+      statusTooltip.style.top = `${rect.bottom + height + 12 > window.innerHeight ? rect.top - height - 8 : rect.bottom + 8}px`;
+    }
+    function hideStatusTooltip() { statusTooltip.hidden = true; }
+    document.addEventListener('pointerover', event => {
+      const label = event.target.closest('.status[data-tooltip]');
+      if (label) showStatusTooltip(label);
+    });
+    document.addEventListener('pointerout', event => {
+      if (event.target.closest('.status[data-tooltip]')) hideStatusTooltip();
+    });
+    document.addEventListener('focusin', event => {
+      const label = event.target.closest('.status[data-tooltip]');
+      if (label) showStatusTooltip(label);
+    });
+    document.addEventListener('focusout', event => {
+      if (event.target.closest('.status[data-tooltip]')) hideStatusTooltip();
+    });
+    window.addEventListener('scroll', hideStatusTooltip, true);
 
     remBtn.addEventListener('click', () => {
       document.getElementById('toastText').textContent = `${selected.size} selected ${selected.size === 1 ? 'system' : 'systems'} would continue to the existing Remediations workflow, where patch type is chosen.`;
