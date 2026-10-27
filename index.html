@@ -66,7 +66,6 @@
     }
     .concept-switcher button:hover { background: #4f5255; }
     .concept-switcher button[aria-selected="true"] { color: var(--ink); background: white; font-weight: 600; }
-    .recommended { margin-left: 5px; color: #bde2b9; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
     .review-actions { display: flex; gap: 8px; }
 
     .btn {
@@ -84,20 +83,6 @@
     .btn:disabled { color: #8a8d90; border-color: #d2d2d2; background: #d2d2d2; cursor: not-allowed; }
     .btn.dark { color: white; border-color: #8a8d90; background: transparent; }
     .icon-btn { width: 36px; padding: 0; display: inline-grid; place-items: center; }
-
-    .annotation {
-      display: none;
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 14px 24px;
-      border-bottom: 1px solid #b8bbbe;
-      background: #fff;
-    }
-    .annotation.active { display: flex; align-items: flex-start; gap: 12px; }
-    .annotation .number { flex: 0 0 auto; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--blue); font-weight: 700; }
-    .annotation p { margin: 0; line-height: 1.5; }
-    .annotation strong { margin-right: 5px; }
-    .annotation .tradeoff { color: var(--muted); }
 
     .app-shell { min-width: 980px; background: white; }
     .masthead { height: 48px; display: flex; align-items: center; gap: 16px; padding: 0 20px; background: #f0f0f0; border-bottom: 1px solid #e2e2e2; }
@@ -145,15 +130,6 @@
     .filter-chip button { padding: 0; border: 0; background: none; cursor: pointer; }
     .clear-link { margin-left: 8px; border: 0; color: var(--blue); background: none; cursor: pointer; font-size: 12px; }
 
-    .summary-cards { display: none; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 10px; margin: 14px 0; }
-    body[data-concept="3"] .summary-cards { display: grid; }
-    .summary-card { min-height: 78px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 4px; background: white; text-align: left; cursor: pointer; }
-    .summary-card:hover { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
-    .summary-card.active { border-left: 4px solid var(--blue); background: var(--blue-light); }
-    .summary-card strong { display: block; font-size: 22px; font-weight: 500; }
-    .summary-card span { font-size: 12px; color: #3c3f42; }
-    .summary-card small { display: block; margin-top: 4px; color: var(--muted); }
-
     .table-scroll { width: 100%; overflow-x: auto; border-bottom: 1px solid var(--border); }
     table { width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 12px; }
     th { height: 44px; padding: 8px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; font-size: 11px; }
@@ -169,17 +145,12 @@
     .sort-indicator { margin-left: 6px; color: var(--muted); }
     .system-cell strong { display: block; font-weight: 400; }
     .system-cell small { display: block; margin-top: 3px; color: var(--muted); }
-    .attached-status { display: none; margin-top: 5px; }
-    body[data-concept="2"] .attached-status { display: inline-flex; }
-    body[data-concept="2"] .livepatch-col { display: none; }
-    body[data-concept="3"] .livepatch-col { display: none; }
-    body[data-concept="3"] .expand-col { display: table-cell; }
-    body:not([data-concept="3"]) .expand-col { display: none; }
+    .expand-col { display: none; }
     .system-view { display: none; }
-    body[data-concept="4"] .cve-view { display: none; }
-    body[data-concept="4"] .system-view { display: block; }
-    body[data-concept="4"] .nav-item.active { background: transparent; border-left-color: transparent; }
-    body[data-concept="4"] .nav-item:nth-of-type(9) { border-left: 3px solid var(--blue); background: white; color: var(--ink); }
+    body[data-view="system"] .cve-view { display: none; }
+    body[data-view="system"] .system-view { display: block; }
+    body[data-view="system"] .nav-item.active { background: transparent; border-left-color: transparent; }
+    body[data-view="system"] .nav-item:nth-of-type(9) { border-left: 3px solid var(--blue); background: white; color: var(--ink); }
     .system-meta { margin: 14px 0 0; color: #3c3f42; font-size: 12px; }
     .system-meta code { padding: 2px 5px; background: #ededed; font-family: inherit; }
     .system-type { display: inline-block; margin-top: 12px; padding: 4px 9px; border-radius: 12px; background: #ededed; font-size: 11px; }
@@ -267,43 +238,23 @@
       .concept-switcher { overflow-x: auto; }
       .summary-grid { grid-template-columns: 1fr; gap: 18px; }
       .metadata { max-width: 420px; }
-      .summary-cards { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
     }
   </style>
 </head>
-<body data-concept="1">
+<body data-view="cve">
   <header class="review-bar">
     <div class="review-title">
-      <strong>RHIN-96 · Live patch status concepts</strong>
-      <span>Interactive PM/UX review prototype · synthetic system data</span>
+      <strong>Live patch status</strong>
+      <span>Interactive Vulnerability preview · sample data</span>
     </div>
-    <nav class="concept-switcher" aria-label="Choose a design concept">
-      <button type="button" data-concept="1" aria-selected="true">1 · Dedicated column <span class="recommended">Recommended</span></button>
-      <button type="button" data-concept="2" aria-selected="false">2 · Attached to system</button>
-      <button type="button" data-concept="3" aria-selected="false">3 · Eligibility summary</button>
-      <button type="button" data-concept="4" aria-selected="false">4 · System details</button>
+    <nav class="concept-switcher" aria-label="Preview pages">
+      <button type="button" data-view="cve" aria-selected="true">CVE details</button>
+      <button type="button" data-view="system" aria-selected="false">System details</button>
     </nav>
     <div class="review-actions">
       <button class="btn dark" id="researchBtn" type="button">How live patching works</button>
     </div>
   </header>
-
-  <section class="annotation active" data-annotation="1">
-    <span class="number">1</span>
-    <p><strong>Recommended:</strong> a dedicated column makes system-specific eligibility explicit, sortable, and easy to compare. <span class="tradeoff">Tradeoff: it consumes table width, so the secondary explanation stays in a popover.</span></p>
-  </section>
-  <section class="annotation" data-annotation="2">
-    <span class="number">2</span>
-    <p><strong>Space-saving:</strong> a plain-language badge travels with the system identity and leaves the existing table structure largely intact. <span class="tradeoff">Tradeoff: status is harder to scan down the table and cannot be sorted as visibly.</span></p>
-  </section>
-  <section class="annotation" data-annotation="3">
-    <span class="number">3</span>
-    <p><strong>Most educational:</strong> aggregate counts reveal the remediation opportunity and act as filters; row expansion explains system-level meaning. <span class="tradeoff">Tradeoff: the summary adds visual weight and hides details until requested.</span></p>
-  </section>
-  <section class="annotation" data-annotation="4">
-    <span class="number">4</span>
-    <p><strong>System-centered:</strong> the same status model answers which CVEs on one system can be addressed without an immediate reboot. <span class="tradeoff">This is a valuable secondary entry point, but availability must still be calculated per CVE and running kernel—not shown as a permanent property of the system.</span></p>
-  </section>
 
   <div class="app-shell">
     <header class="masthead">
@@ -352,7 +303,7 @@
         <section class="summary-grid" aria-label="CVE summary">
           <div class="cve-copy">
             <p>Publish date: &nbsp;17 Sept 2026</p>
-            <p>A flaw was found in Redis community. The cluster bus packet parser fails to properly validate string-carrying extensions for null-termination. Successful exploitation could result in the disclosure of sensitive information or a remote denial of service.</p>
+            <p>A flaw in the Linux kernel could allow a local attacker to access sensitive information. A kernel update addresses this vulnerability; compatible running kernels may also be protected by a live patch without an immediate reboot.</p>
             <p>For most up-to-date information, <a href="#">View in Red Hat CVE database ↗</a></p>
           </div>
           <dl class="metadata">
@@ -367,13 +318,6 @@
           <div class="table-title-row">
             <h2><span id="visibleCount">8</span> systems affected</h2>
             <span class="subtle" id="selectionCount" aria-live="polite"></span>
-          </div>
-
-          <div class="summary-cards" aria-label="Live patch status summary">
-            <button class="summary-card" type="button" data-card-filter="available"><strong>2</strong><span>Live patch available</span><small>Can avoid an immediate reboot</small></button>
-            <button class="summary-card" type="button" data-card-filter="applied"><strong>2</strong><span>Live patch applied</span><small>Currently protected</small></button>
-            <button class="summary-card" type="button" data-card-filter="setup"><strong>2</strong><span>Setup required</span><small>Patch exists; system is not ready</small></button>
-            <button class="summary-card" type="button" data-card-filter="all"><strong>8</strong><span>All affected systems</span><small>Includes unavailable and unknown</small></button>
           </div>
 
           <div class="toolbar" aria-label="Systems table controls">
@@ -462,15 +406,15 @@
         </section>
         </div>
 
-        <section class="system-view" aria-label="System vulnerability details concept">
+        <section class="system-view" aria-label="System vulnerability details">
           <div class="breadcrumbs" aria-label="Breadcrumb">
             <span>Red Hat Hybrid Cloud Console</span><span>RHEL</span><span>Security</span><span>Vulnerability</span><span>Systems</span>
           </div>
           <div class="page-heading">
             <div>
-              <h1>rhsat617.syslab.pnq2.redhat.com</h1>
+              <h1>prod-api-01.example.com</h1>
               <p class="system-meta">UUID: &nbsp;<code>23a7a3e1-ca99-4bf4-a43f-6b05f14914df</code>&nbsp;&nbsp; ▣</p>
-              <p class="system-meta">Last seen: &nbsp;28 Sep 2026 16:45 UTC</p>
+              <p class="system-meta">Last seen: &nbsp;18 minutes ago</p>
               <span class="system-type">▣&nbsp; Package-based</span>
             </div>
             <div><button class="btn" type="button" disabled>Delete</button>&nbsp; <button class="btn" type="button">Actions&nbsp;⌄</button></div>
@@ -496,7 +440,7 @@
               <button class="icon-btn btn" type="button" aria-label="Table settings">⚙</button><button class="icon-btn btn" type="button" aria-label="More actions">⋮</button>
             </div>
             <div class="table-scroll" id="systemTableWrap">
-              <table aria-label="CVEs affecting rhsat617.syslab.pnq2.redhat.com">
+              <table aria-label="CVEs affecting prod-api-01.example.com">
                 <thead><tr><th class="check-col"></th><th>CVE ID ↕</th><th>Publish date ↓</th><th>Severity ↕</th><th>CVSS base score ↕</th><th>Advisory ↕</th><th>Business risk ↕</th><th>Status ↕</th><th>Remediation</th><th>Live patch <span class="popover-wrap"><button class="info-trigger system-info" type="button" aria-label="About live patch status">ⓘ</button></span></th><th></th></tr></thead>
                 <tbody id="systemCveBody"></tbody>
               </table>
@@ -568,7 +512,6 @@
       unknown: 'Inventory data is incomplete'
     };
 
-    let concept = 1;
     let selected = new Set();
     let systemSelected = new Set();
     let sortKey = 'lastSeen';
@@ -607,7 +550,7 @@
         <tr class="data-row ${selected.has(system.id) ? 'selected' : ''}" data-id="${system.id}">
           <td class="expand-col"><button class="expand-btn" type="button" aria-expanded="false" aria-label="Show live patch details for ${system.name}">›</button></td>
           <td class="check-col"><input class="row-check" type="checkbox" ${selected.has(system.id) ? 'checked' : ''} aria-label="Select ${system.name}"></td>
-          <td class="system-cell"><strong><a href="#">▣&nbsp; ${system.name}</a></strong><small>${system.kernel}</small><span class="attached-status">${statusBadge(system.patch, true)}</span></td>
+          <td class="system-cell"><strong>${system.id === 1 ? `<a href="#system" data-navigate="system">▣&nbsp; ${system.name}</a>` : `▣&nbsp; ${system.name}`}</strong><small>${system.kernel}</small></td>
           <td>${system.workspace}</td><td>⬟&nbsp; ${system.tags}</td><td>${system.os}</td>
           <td><a href="#">${system.advisory}</a></td><td>${system.status}</td><td>${system.seenText}</td><td>${system.remediation}</td>
           <td class="livepatch-col">${statusBadge(system.patch)}</td><td><button class="more" type="button" aria-label="Actions for ${system.name}">⋮</button></td>
@@ -625,7 +568,6 @@
       const isFiltered = filter.value !== 'all';
       document.getElementById('filterSummary').hidden = !isFiltered;
       document.getElementById('chipText').textContent = filter.options[filter.selectedIndex].text;
-      document.querySelectorAll('.summary-card').forEach(card => card.classList.toggle('active', card.dataset.cardFilter === filter.value));
       updateSelection();
       wireRows();
     }
@@ -642,7 +584,7 @@
       document.getElementById('systemCveBody').innerHTML = rows.map(item => `
         <tr class="data-row ${systemSelected.has(item.id) ? 'selected' : ''}" data-system-cve="${item.id}">
           <td class="check-col"><input class="system-row-check" type="checkbox" ${systemSelected.has(item.id) ? 'checked' : ''} aria-label="Select ${item.cve}"></td>
-          <td><a href="#">${item.cve}</a></td><td>${item.date}</td><td><span class="severity">◆ ${item.severity}</span></td><td>${item.score}</td>
+          <td>${item.id === 101 ? `<a href="#cve" data-navigate="cve">${item.cve}</a>` : item.cve}</td><td>${item.date}</td><td><span class="severity">◆ ${item.severity}</span></td><td>${item.score}</td>
           <td><a href="#">${item.advisory}</a></td><td>${item.risk}</td><td>${item.review}</td><td>${item.remediation}</td>
           <td>${statusBadge(item.patch)}</td><td><button class="more" type="button" aria-label="Actions for ${item.cve}">⋮</button></td>
         </tr>`).join('');
@@ -692,14 +634,19 @@
       }));
     }
 
+    function showView(view) {
+      document.body.dataset.view = view;
+      document.querySelectorAll('.concept-switcher button').forEach(button => {
+        button.setAttribute('aria-selected', String(button.dataset.view === view));
+      });
+      window.scrollTo(0, 0);
+    }
+    function syncViewFromHash() { showView(window.location.hash === '#system' ? 'system' : 'cve'); }
     document.querySelectorAll('.concept-switcher button').forEach(button => button.addEventListener('click', () => {
-      concept = Number(button.dataset.concept);
-      document.body.dataset.concept = concept;
-      document.querySelectorAll('.concept-switcher button').forEach(item => item.setAttribute('aria-selected', String(item === button)));
-      document.querySelectorAll('.annotation').forEach(item => item.classList.toggle('active', item.dataset.annotation === String(concept)));
-      render();
-      if (concept === 4) renderSystem();
+      window.location.hash = button.dataset.view;
+      syncViewFromHash();
     }));
+    window.addEventListener('hashchange', syncViewFromHash);
 
     filter.addEventListener('change', render);
     search.addEventListener('input', render);
@@ -707,11 +654,6 @@
     document.getElementById('clearFilters').addEventListener('click', resetFilters);
     document.getElementById('emptyReset').addEventListener('click', resetFilters);
     function resetFilters() { filter.value = 'all'; search.value = ''; render(); }
-
-    document.querySelectorAll('.summary-card').forEach(card => card.addEventListener('click', () => {
-      filter.value = card.dataset.cardFilter;
-      render();
-    }));
 
     document.getElementById('systemPatchFilter').addEventListener('change', renderSystem);
     document.getElementById('systemSearch').addEventListener('input', renderSystem);
@@ -770,9 +712,7 @@
 
     render();
     renderSystem();
-    const requestedConcept = new URLSearchParams(window.location.search).get('concept');
-    const requestedButton = document.querySelector(`.concept-switcher button[data-concept="${requestedConcept}"]`);
-    if (requestedButton) requestedButton.click();
+    syncViewFromHash();
   </script>
 </body>
 </html>
